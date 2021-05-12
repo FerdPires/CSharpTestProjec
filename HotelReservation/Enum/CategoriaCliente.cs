@@ -1,4 +1,4 @@
-﻿namespace HotelReservationDDD.Enum
+﻿namespace HotelReservation.Enum
 {
     public enum CategoriaCliente
     {

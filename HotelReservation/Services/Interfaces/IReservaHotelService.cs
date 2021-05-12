@@ -1,8 +1,8 @@
-﻿using HotelReservationDDD.Enum;
+﻿using HotelReservation.Enum;
 using System;
 using System.Collections.Generic;
 
-namespace HotelReservationDDD.Domain.Services.Interfaces
+namespace HotelReservation.Domain.Services.Interfaces
 {
     public interface IReservaHotelService
     {

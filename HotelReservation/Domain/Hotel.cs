@@ -1,9 +1,9 @@
-﻿using HotelReservationDDD.Enum;
+﻿using HotelReservation.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HotelReservationDDD.Domain
+namespace HotelReservation.Domain
 {
     public class Hotel
     {

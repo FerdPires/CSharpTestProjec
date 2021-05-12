@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HotelReservationDDD.Domain.Repository
+namespace HotelReservation.Domain.Repository
 {
     public interface IHotelRepository
     {

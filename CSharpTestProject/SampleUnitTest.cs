@@ -1,119 +1,97 @@
-using CSharpTestProject.Mocks;
-using HotelReservationDDD.Domain;
-using HotelReservationDDD.Domain.Services;
-using HotelReservationDDD.Enum;
-using Moq;
+using CSharpTestProject.FakeRepositories;
+using HotelReservation.Domain;
+using HotelReservation.Domain.Services;
+using HotelReservation.Enum;
 using System;
 using System.Collections.Generic;
 using Xunit;
 
 namespace CSharpTestProject
 {
-    //Escreva um programa para encontrar o hotel mais barato. A entrada do programa será uma sequência de datas 
-    //para um cliente participante ou não do programa de fidelidade. Utilize "Regular" para denominar um cliente normal 
-    //e "Fidelidade" para um cliente participante do programa de fidelidade. 
+    //Escreva um programa para encontrar o hotel mais barato. 
+    //A entrada do programa será uma sequência de datas para um cliente participante ou não do programa de fidelidade. 
+    //Utilize "Regular" para denominar um cliente normal e "Fidelidade" para um cliente participante do programa de fidelidade. 
     //A saída deverá ser o hotel disponível mais barato e em caso de empate, o hotel com a maior classificação deverá ser retornado.
 
-    //Cenários de aceite
-
-    //1.DeveRetornarHotelMaisBaratoDisponivel
-    //2.DeveRetornarHotelMaisBaratoDisponivelParaClienteRegular
-    //3.DeveRetornarHotelMaisBaratoDisponivelParaClienteFidelidade
-    //4.DeveRetornarHotelComMaiorClassificacaoDisponivelSeHouverEmpateDosMaisBaratos
-    //5.DeveRetornarHotelParqueDasFloresParaClienteRegular
-    //6.DeveRetornarHotelJardimBotanicoParaClienteRegular
-    //7.DeveRetornarHotelMarAtlanticoParaClienteFidelidade
-
-    //Modelagem
-
-    //Enum da categoria do cliente
-    //Modelo de Hotel (informações do hotel)
-    //Cada hotel deve ter uma avaliação, e lista de valores para dia de semana e fim de semana
-    //Cálculo para o retorno do hotel mais barato para aquele dia, em caso de empate, será retornado o de maior avaliação 
-    //Como a regra aceita uma lista de datas, deverá ser somado os valores da diária 
+    //1.Encontrar o hotel mais barato
+    //2.Fazer o cálculo dos valores da diária de cada hotel - OK
+    //3.Quando der empate nos valores dos hoteis, deve retornar aquele com a maior classificação 
+    //---------------------------------------------------------------------------------------------
 
     public class SampleUnitTest
     {
-        //private Mock<FakeHotelRepository> _hotelRepositoryMock;
+        private List<Preco> _listaPrecos;
+        private Hotel _hotel;
+        private FakeHotelRepository _hotelRepository;
+        private ReservaHotelService _serviceHotel;
 
-        //public SampleUnitTest()
-        //{
-        //    _hotelRepositoryMock = new Mock<FakeHotelRepository>();
-        //}
+        public SampleUnitTest()
+        {
+            _listaPrecos = new List<Preco>()
+            {
+                new Preco(110, false, CategoriaCliente.Regular),
+                new Preco(80, false, CategoriaCliente.Fidelidade),
+                new Preco(90, true, CategoriaCliente.Regular),
+                new Preco(80, true, CategoriaCliente.Fidelidade),
+            };
+
+            _hotel = new Hotel("Parque das flores", 3, _listaPrecos);
+
+            _hotelRepository = new FakeHotelRepository();
+            _serviceHotel = new ReservaHotelService(_hotelRepository);
+        }
 
         [Fact]
-        public void ShouldBeLakewoodForRegularGuest()
+        public void DeveCalcularPrecoHotelSomandoValoresEncontrados()
         {
-            List<DateTime> dates = new List<DateTime>()
+            var datas = new List<DateTime>()
             {
                 new DateTime(2021, 05, 16),
                 new DateTime(2021, 05, 17),
                 new DateTime(2021, 05, 18)
             };
 
-            //  _hotelRepositoryMock.Setup(h => h.GetHotels()).Returns(new FakeHotelRepository().GetHotels());
-            Hotel cheapestHotel = new ReservaHotelService(new FakeHotelRepository()).BuscarHotelMaisBarato(CategoriaCliente.Regular, dates);
+            var somaValores = _hotel.CalcularPrecoReservaHotel(CategoriaCliente.Regular, datas);
 
-            Assert.Equal("Parque das Flores", cheapestHotel.NomeHotel);
+            Assert.Equal(310, somaValores);
         }
-        //[Fact]
-        //public void DeveRetornarHotelMaisBaratoDisponivelParaClienteRegular()
-        //{
-        //    var reservaHotelService = new ReservaHotelService();
-        //    var categoriaCliente = CategoriaCliente.Regular;
-        //    var datas = new List<DateTime>() 
-        //    {
-        //        new DateTime(2021, 05, 16),
-        //        new DateTime(2021, 05, 17),
-        //        new DateTime(2021, 05, 18)
-        //    };
 
-        //    var hotelMaisBarato = reservaHotelService.BuscarHotelMaisBarato(categoriaCliente, datas);
+        [Fact]
+        public void DeveRetornarExceptionSeListaDeDatasEnviadaForNula()
+        {
+            List<DateTime> datas = null;
 
-        //    Assert.Equal("Parque das Flores", hotelMaisBarato);
-        //}
+            Assert.Throws<ArgumentException>(() => _hotel.CalcularPrecoReservaHotel(CategoriaCliente.Regular, datas));
+        }
 
-        //[Fact]
-        //public void DeveRetornarHotelMaisBaratoDisponivelParaClienteFidelidade()
-        //{
-        //    var reservaHotelService = new ReservaHotelService();
-        //    var categoriaCliente = CategoriaCliente.Fidelidade;
-        //    var datas = new List<DateTime>()
-        //    {
-        //        new DateTime(2021, 05, 16),
-        //        new DateTime(2021, 05, 17),
-        //        new DateTime(2021, 05, 18)
-        //    };
+        [Fact]
+        public void DeveRetornarHotelMaisBarato()
+        {
+            var datas = new List<DateTime>()
+            {
+                new DateTime(2021, 05, 21),
+                new DateTime(2021, 05, 22),
+                new DateTime(2021, 05, 23)
+            };
 
-        //    var hotelMaisBarato = reservaHotelService.BuscarHotelMaisBarato(categoriaCliente, datas);
+            var hotelMaisBarato = _serviceHotel.BuscarHotelMaisBarato(CategoriaCliente.Regular, datas);
 
-        //    Assert.Equal("Mar Atlântico", hotelMaisBarato);
-        //}
+            Assert.Equal("Jardim Botânico", hotelMaisBarato.NomeHotel);
+        }
 
-        //DeveRetornarHotelDeMaiorClassificacao
-        //DeveRetornarHotelDeMaiorClassificacaoClienteRegular
-        //DeveRetornarHotelDeMaiorClassificacaoClienteFidelidade
+        [Fact]
+        public void DeveRetornarHotelComMaiorClassificacaoCasoEncontreMaisDeUmHotelComMesmoValor()
+        {
+            var datas = new List<DateTime>()
+            {
+                new DateTime(2021, 05, 27),
+                new DateTime(2021, 05, 28),
+                new DateTime(2021, 05, 29)
+            };
+
+            var hotelMaisBarato = _serviceHotel.BuscarHotelMaisBarato(CategoriaCliente.Fidelidade, datas);
+
+            Assert.Equal("Mar Atlântico", hotelMaisBarato.NomeHotel);
+        }
     }
-
-    //public enum CategoriaCliente
-    //{
-    //    Fidelidade,
-    //    Regular
-    //}
-
-    //internal class ReservaHotelService
-    //{
-    //    public ReservaHotelService()
-    //    {
-    //    }
-
-    //    public string BuscarHotelMaisBarato(CategoriaCliente categoriaCliente, List<DateTime> datas)
-    //    {
-    //        if(categoriaCliente == CategoriaCliente.Regular)
-    //            return "Parque das Flores";
-    //        else
-    //            return "Mar Atlântico";
-    //    }
-    //}
 }
- 

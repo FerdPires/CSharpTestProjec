@@ -1,6 +1,6 @@
-﻿using HotelReservationDDD.Enum;
+﻿using HotelReservation.Enum;
 
-namespace HotelReservationDDD.Domain
+namespace HotelReservation.Domain
 {
     public class Preco
     {
